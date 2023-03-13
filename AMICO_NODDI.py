@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Mar 15 13:28:28 2022
-
-@author: lw19
-"""
+#run AMICO 
 
 import sys
 diffusivity = sys.argv[1]
