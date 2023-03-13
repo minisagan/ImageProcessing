@@ -1,4 +1,5 @@
 #!/bin/zsh 
+#prep data for and run AMICO (NODDI) 
 """
 dwidir=/data1/CHD/ShardRecon03-cardiac
 T2dir=/data1/CHD/derivatives 
