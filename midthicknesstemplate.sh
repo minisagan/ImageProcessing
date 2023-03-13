@@ -1,4 +1,6 @@
 #!/bin/zsh 
+
+#create midthickness surface in template space to use for resampling of other metrics 
 """
 dwidir=/data1/CHD/ShardRecon03-cardiac
 T2dir=/data1/CHD/derivatives
@@ -13,9 +15,9 @@ dataset=dHCP
 #sesid=113
 #subject_list=/home/sma22/Desktop/NormMod/${dataset}/emma_mean_list_dhcp.txt
 
-#for subjid sesid pma in $(cat <${subject_list}) ; do
-subjid=CC01111XX06
-sesid=100031
+for subjid sesid pma in $(cat <${subject_list}) ; do
+#subjid=CC01111XX06
+#sesid=100031
 for hemi in left ; do 
 echo ${subjid} ${sesid}
 
