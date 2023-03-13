@@ -1,6 +1,6 @@
 #!/bin/zsh 
 #prep data for and run AMICO (NODDI) 
-"""
+
 dwidir=/data1/CHD/ShardRecon03-cardiac
 T2dir=/data1/CHD/derivatives 
 diffFolder=/data1/CHD
@@ -10,12 +10,13 @@ dwidir=/data2/dHCP/ShardRecon03
 T2dir=/data2/dHCP/derivatives_dHCP
 diffFolder=/data2/dHCP
 dataset=dHCP
+"""
 #subjid=100
 #sesid=65
-subject_list=/home/sma22/Desktop/NormMod/${dataset}/sub_ses_list.txt
+subject_list=/home/sma22/Desktop/NormMod/${dataset}/surf_list.txt
 
 echo "converting bvals and bvecs + creating and transforming cortical masks"
-for subjid sesid in $(cat <${subject_list}) ; do 
+for subjid sesid pma in $(cat <${subject_list}) ; do 
 
 mrconvert ${dwidir}/sub-${subjid}/ses-${sesid}/reconmask.mif.gz ${dwidir}/sub-${subjid}/ses-${sesid}/reconmask.nii -force
 
@@ -39,7 +40,7 @@ python /home/sma22/Desktop/NormMod/scripts/AMICO_NODDI.py ${diff} ${subject_list
 
 
 echo "ribbon constrained volume to surface mapping" 
-for subjid sesid in $(cat <${subject_list}); do 
+for subjid sesid pma in $(cat <${subject_list}); do 
 echo "sub-${subjid} ses-${sesid}"
 for hemi in left right ; do 
 for mod in ICVF ISOVF OD ; do  #make sure correct 
@@ -67,12 +68,10 @@ wb_command -volume-to-surface-mapping ${vol} ${str2diff_surf} ${output} -ribbon-
 echo "resampling"
 output1=${diffFolder}/surface_processing/sub-${subjid}/ses-${sesid}/dhcpSym_32k/sub-${subjid}_ses-${sesid}_hemi-${hemi}_space-dhcpSym40_${mod}.shape.gii
 
-if [[ ${dataset} = CHD ]]
-then
-	wb_command -metric-resample ${output} ${diffFolder}/surface_processing/surface_transforms/sub-${subjid}_ses-${sesid}_hemi-${hemi}_from-native_to-dhcpSym40_dens-32k_mode-sphere.reg40.surf.gii /data2/dHCP/dhcpSym_template/week-40_hemi-${hemi}_space-dhcpSym_dens-32k_sphere.surf.gii ADAP_BARY_AREA -area-surfs ${T2dir}/sub-${subjid}/ses-${sesid}/anat/Native/sub-${subjid}_ses-${sesid}_${hemi}_midthickness.surf.gii ${diffFolder}/surface_processing/sub-${subjid}/ses-${sesid}/dhcpSym_32k/sub-${subjid}_ses-${sesid}_hemi-${hemi}_space-dhcpSym40_midthickness.surf.gii ${output1}
-else
-	wb_command -metric-resample ${output} ${T2dir}/sub-${subjid}/ses-${sesid}/xfm/sub-${subjid}_ses-${sesid}_hemi-${hemi}_from-native_to-dhcpSym40_dens-32k_mode-sphere.surf.gii /data2/dHCP/dhcpSym_template/week-40_hemi-${hemi}_space-dhcpSym_dens-32k_sphere.surf.gii ADAP_BARY_AREA -area-surfs ${T2dir}/sub-${subjid}/ses-${sesid}/anat/Native/sub-${subjid}_ses-${sesid}_${hemi}_midthickness.surf.gii ${diffFolder}/surface_processing/sub-${subjid}/ses-${sesid}/dhcpSym_32k/sub-${subjid}_ses-${sesid}_hemi-${hemi}_space-dhcpSym40_midthickness.surf.gii ${output1}
-fi
+#mkdir -p ${diffFolder}/surface_processing/sub-${subjid}/ses-${sesid}/dhcpSym_32k/Diffusion
+
+wb_command -metric-resample ${output} ${T2dir}/sub-${subjid}/ses-${sesid}/anat/Native/${hemi}.sphere.reg.surf.gii /data2/dHCP/dhcpSym_template/week-40_hemi-${hemi}_space-dhcpSym_dens-32k_sphere.surf.gii ADAP_BARY_AREA -area-surfs ${T2dir}/sub-${subjid}/ses-${sesid}/anat/Native/sub-${subjid}_ses-${sesid}_${hemi}_midthickness.surf.gii ${diffFolder}/surface_processing/sub-${subjid}/ses-${sesid}/dhcpSym_32k/sub-${subjid}_ses-${sesid}_hemi-${hemi}_space-dhcpSym40_midthickness.surf.gii ${output1}
+
 
 wb_command -metric-mask ${output1} /data1/CHD/surface_processing/week-40_hemi-${hemi}_space-dhcpSym_dens-32k_desc-medialwallsymm_mask.shape.gii ${output1}
 
@@ -80,4 +79,3 @@ wb_command -metric-mask ${output1} /data1/CHD/surface_processing/week-40_hemi-${
 done
 done
 done
-
