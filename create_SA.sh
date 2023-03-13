@@ -1,4 +1,6 @@
 #!/bin/zsh 
+#extracting area from pial and midthickness surface files 
+
 
 T2dir=/data1/CHD/derivatives 
 dataset=CHD
